@@ -40,7 +40,7 @@ app.get("/cars/unavaliable", (req, res) => {
 });
 
 app.post("/cars", (req, res) => {
-    const car = req.body;
+    let car = req.body;
 
     if (!car.name)
         res.status(400).send({
