@@ -6,11 +6,13 @@ app.use(express.json());
 
 var database = [
     {
+        id: 0,
         name: "Civic",
         brand: "Honda",
         avaliable: true,
     },
     {
+        id: 1,
         name: "Supra",
         brand: "Toyota",
         avaliable: false,
@@ -37,22 +39,6 @@ app.get("/cars/unavaliable", (req, res) => {
     res.status(200).send(database.filter((car) => !car.avaliable));
 });
 
-app.delete("/cars/:name", (req, res) => {
-    const { name } = req.params;
-    const list = database.filter(
-        (car) => car.name.toLowerCase() == name.toLowerCase()
-    );
-
-    if (list.length > 0) {
-        database = database.filter(
-            (car) => car.name.toLowerCase() != name.toLowerCase()
-        );
-        res.send(database);
-    } else {
-        res.status(404).send({ message: "Car not found!" });
-    }
-});
-
 app.post("/cars", (req, res) => {
     const car = req.body;
 
@@ -66,8 +52,38 @@ app.post("/cars", (req, res) => {
         });
     else {
         car.avaliable = car.avaliable || true;
+        car.id = database.length;
         database.push(car);
         res.status(201).send({ message: "New car added!" });
+    }
+});
+
+app.put("/cars/:id", (req, res) => {
+    const { id } = req.params;
+    const reqcar = req.body;
+
+    database
+        .filter((car) => car.id == id)
+        .forEach(
+            (car) => (
+                (car.avaliable = reqcar.avaliable),
+                (car.name = reqcar.name),
+                (car.brand = reqcar.brand)
+            )
+        );
+
+    res.status(200).send({ message: "Car updated" });
+});
+
+app.delete("/cars/:id", (req, res) => {
+    const { id } = req.params;
+    const list = database.filter((car) => car.id == id);
+
+    if (list.length > 0) {
+        database = database.filter((car) => car.id != id);
+        res.send(database);
+    } else {
+        res.status(404).send({ message: "Car not found!" });
     }
 });
 
